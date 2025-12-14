@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository Mirror</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: rgba(22, 27, 34, 0.7);
+            --card-border: rgba(48, 54, 61, 0.7);
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-color: #58a6ff;
+            --success-color: #238636;
+            --danger-color: #da3633;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            --glow-primary: rgba(88, 166, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body {
+            background-color: #050510;
+            /* Deep indigo-black */
+            /* Dynamic vibrant mesh background */
+            background-image:
+                radial-gradient(at 0% 0%, rgba(88, 166, 255, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(200, 50, 200, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(35, 134, 54, 0.2) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(255, 100, 50, 0.15) 0px, transparent 50%);
+            background-size: 150% 150%;
+            animation: gradientFlow 15s ease infinite;
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 3rem 1.5rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            /* Wider for dashboard view */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #a5d6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(22, 27, 34, 0.8);
+            padding: 0.5rem;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            outline: none;
+            padding: 0.8rem 1rem;
+        }
+
+        button {
+            background-color: #238636;
+            background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 0 rgba(27, 31, 35, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
+        }
+
+        button:disabled {
+            background-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .results {
+            display: none;
+            flex-direction: column;
+            gap: 2rem;
+            perspective: 1000px;
+        }
+
+        .card {
+            background: rgba(20, 25, 40, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            /* Hidden initially for animation */
+            animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Staggered Animation Delays for up to 10 cards */
+        .card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.01);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Vivid Top Border Gradient */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff0f7b, #f89b29, #58a6ff);
+            opacity: 0.8;
+            border-radius: 16px 16px 0 0;
+        }
+
+        @keyframes textShimmer {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .score-value {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(79, 172, 254, 0.4));
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dashboard Grid placements - REMOVED for vertical stack */
+        /*
+        @media (min-width: 900px) {
+           ... grid rules removed ...
+        }
+        */
+
+        /* Mobile Stack */
+        @media (max-width: 899px) {
+            .results {
+                display: flex !important;
+                flex-direction: column;
+            }
+        }
+
+        /* Roadmap Card */
+        .roadmap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .roadmap-step {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 28px;
+            height: 28px;
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 50%;
+            margin-top: 2px;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+        }
+
+        .step-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .step-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Repository Mirror</h1>
+        <p class="subtitle">Automated Engineering Proficiency Evaluation</p>
+
+        <div class="input-group">
+            <input type="text" id="repoUrl" placeholder="Required: https://github.com/username/repo" autocomplete="off">
+            <button id="analyzeBtn" onclick="analyzeRepo()">Run Architectural Audit</button>
+        </div>
+
+        <div class="loader" id="loader">
+            Evaluated dimensions: Structure, Metadata, Consistency, Testing Norms...
+        </div>
+        <div class="error-msg" id="errorMsg"></div>
+
+        <div class="results" id="results">
+            <!-- 1. Score Overview -->
+            <div class="card score-overview-card">
+                <div class="score-main">
+                    <span class="score-label">Engineering Health Score</span>
+                    <div class="score-value-container">
+                        <span class="score-value" id="scoreValue">--</span>
+                        <span class="score-max">/100</span>
+                    </div>
+                </div>
+
+                <div class="score-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Proficiency Level</span>
+                        <span class="level-badge" id="levelBadge">--</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Confidence</span>
+                        <div class="confidence-badge" title="Reliability based on data points">
+                            <span class="confidence-dot" id="confidenceDot"></span>
+                            <span id="confidenceText">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Evaluation Summary -->
+            <div class="card summary-card">
+                <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    Technical Assessment
+
+                    <div class="toggle-container">
+                        <span class="toggle-label active" id="lblStudent"
+                            onclick="setSummaryView('student')">Student</span>
+                        <label class="switch">
+                            <input type="checkbox" id="viewToggle" onchange="toggleView()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label" id="lblRecruiter"
+                            onclick="setSummaryView('recruiter')">Recruiter</span>
+                    </div>
+                </div>
+
+                <p id="summaryText" class="summary-text">
+
+                </p>
+
+                <div id="viewDescription" class="view-desc-text">
+                    Currently showing growth-oriented mentorship feedback.
+                </div>
+            </div>
+
+            <!-- 3. Repository Health Flags -->
+            <div class="card health-flags-wrapper">
+                <div class="section-title">Repository Health Flags</div>
+                <div class="health-flags-container" id="healthFlagsContainer">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- 4. Score Breakdown -->
+            <div class="card breakdown-wrapper">
+                <div class="section-title">Score Breakdown</div>
+                <div id="breakdownContainer">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- 5. Score Improvement Simulation -->
+            <div class="card sim-wrapper">
+                <div class="section-title">Potential Score Improvements</div>
+                <div id="simulationContainer">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- 6. Personalized Roadmap -->
+            <div class="card roadmap-wrapper">
+                <div class="section-title">Personalized Improvement Roadmap</div>
+                <div class="roadmap-container" id="roadmapContainer">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSummaryData = null;
+
+        async function analyzeRepo() {
+            const urlInput = document.getElementById('repoUrl');
+            const btn = document.getElementById('analyzeBtn');
+            const loader = document.getElementById('loader');
+            const results = document.getElementById('results');
+            const errorMsg = document.getElementById('errorMsg');
+
+            const repoUrl = urlInput.value.trim();
+            if (!repoUrl) return;
+
+            // Reset UI
+            results.style.display = 'none';
+            errorMsg.style.display = 'none';
+            loader.style.display = 'block';
+            btn.disabled = true;
+            btn.innerText = 'Auditing...';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ repo_url: repoUrl })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || 'Analysis failed');
+                }
+
+                const data = await response.json();
+                renderResults(data);
+
+            } catch (err) {
+                errorMsg.innerText = err.message;
+                errorMsg.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+                btn.disabled = false;
+                btn.innerText = 'Run Architectural Audit';
+            }
+        }
+
+        function renderResults(data) {
+            document.getElementById('scoreValue').innerText = data.total_score;
+            document.getElementById('levelBadge').innerText = data.level;
+
+            // Color coding for score
+            const scoreEl = document.getElementById('scoreValue');
+            const levelEl = document.getElementById('levelBadge');
+
+            let color = '#da3633';
+            if (data.total_score >= 80) color = '#238636';
+            else if (data.total_score >= 40) color = '#e3b341';
+
+            scoreEl.style.color = color;
+            levelEl.style.borderColor = color;
+            levelEl.style.color = color;
+
+            // Confidence
+            const confidence = data.details.flags.confidence_score || { level: "Medium" };
+            const confLevel = confidence.level;
+            document.getElementById('confidenceText').innerText = confLevel;
+
+            const dot = document.getElementById('confidenceDot');
+            dot.className = 'confidence-dot ' + confLevel;
+
+            // Health Flags
+            const flagsContainer = document.getElementById('healthFlagsContainer');
+            flagsContainer.innerHTML = '';
+
+            const flags = data.details.flags || {};
+            let hasFlags = false;
+
+            // Map keys to display titles if needed, or use formatted keys
+            for (const [key, value] of Object.entries(flags)) {
+                if (key === 'confidence_score') continue; // Handled separately
+
+                // If the flag is active (value.value is true)
+                if (value && value.value) {
+                    hasFlags = true;
+                    const badge = document.createElement('div');
+
+                    // Determine if risk or neutral (simple heuristic for now: most flags are risks/warnings)
+                    // You requested "Informational" vs "Risk". 
+                    // Let's assume most are Risks for now as they deduct points or warn.
+                    // Customize class based on key if needed.
+                    let isRisk = true;
+                    if (key === 'overengineered') isRisk = false; // Example of neutral/info
+
+                    badge.className = isRisk ? 'health-flag flag-risk' : 'health-flag';
+                    badge.title = value.description; // Tooltip
+
+                    // Format title: "missing_readme" -> "Missing Readme"
+                    const title = key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    badge.innerText = title;
+
+                    flagsContainer.appendChild(badge);
+                }
+            }
+
+            if (!hasFlags) {
+                const emptyMsg = document.createElement('span');
+                emptyMsg.style.color = 'var(--text-secondary)';
+                emptyMsg.style.fontStyle = 'italic';
+                emptyMsg.innerText = "No critical health flags detected.";
+                flagsContainer.appendChild(emptyMsg);
+            }
+
+            // Audit Breakdown
+            const breakdownContainer = document.getElementById('breakdownContainer');
+            breakdownContainer.innerHTML = '';
+
+            const breakdown = data.details.breakdown || {};
+
+            for (const [key, item] of Object.entries(breakdown)) {
+                const row = document.createElement('div');
+                row.className = 'audit-row';
+
+                const leftDiv = document.createElement('div');
+                const title = document.createElement('div');
+                title.className = 'audit-cat';
+                title.innerText = key; // Key is already readable e.g. "Code Organization"
+
+                const desc = document.createElement('div');
+                desc.className = 'audit-desc';
+                // Use the hint provided by backend, or joined reasons if preferred
+                desc.innerText = item.hint || "Metric evaluation.";
+
+                leftDiv.appendChild(title);
+                leftDiv.appendChild(desc);
+
+                const rightDiv = document.createElement('div');
+                rightDiv.className = 'audit-score';
+                rightDiv.innerText = `+${item.score}/${item.max_score}`;
+
+                row.appendChild(leftDiv);
+                row.appendChild(rightDiv);
+
+                breakdownContainer.appendChild(row);
+            }
+
+            // Simulation
+            const simContainer = document.getElementById('simulationContainer');
+            simContainer.innerHTML = '';
+
+            const simulation = data.details.simulation || {};
+            const potentialScore = simulation.potential_score || data.total_score;
+            // Add "Current Potential" text if you like
+
+            const improvements = simulation.top_improvements || [];
+
+            if (improvements.length === 0) {
+                const goodMsg = document.createElement('span');
+                goodMsg.style.color = 'var(--text-secondary)';
+                goodMsg.innerText = "No immediate high-impact improvements detected. Good job!";
+                simContainer.appendChild(goodMsg);
+            } else {
+                improvements.forEach(imp => {
+                    const row = document.createElement('div');
+                    row.className = 'sim-row';
+
+                    const action = document.createElement('span');
+                    action.className = 'sim-action';
+                    action.innerText = imp.action;
+
+                    const gain = document.createElement('span');
+                    gain.className = 'sim-gain';
+                    gain.innerText = `+${imp.points_gain}`;
+
+                    row.appendChild(action);
+                    row.appendChild(gain);
+                    simContainer.appendChild(row);
+                });
+            }
+
+            // Store description data globally
+            currentSummaryData = data.summary;
+
+            // Default to Student View
+            document.getElementById('viewToggle').checked = false;
+            updateSummaryDisplay('student');
+
+            // Roadmap
+            const roadmapContainer = document.getElementById('roadmapContainer');
+            roadmapContainer.innerHTML = '';
+
+            data.roadmap.forEach((item, index) => {
+                const step = document.createElement('div');
+                step.className = 'roadmap-step';
+
+                // Parse "Title: Description"
+                // e.g., "Documentation First: Create a README..."
+                const parts = item.split(':');
+                let title = '';
+                let desc = item;
+
+                if (parts.length > 1) {
+                    title = parts[0].trim();
+                    desc = parts.slice(1).join(':').trim();
+                } else {
+                    // Fallback if no colon
+                    title = `Step ${index + 1}`;
+                }
+
+                const num = document.createElement('div');
+                num.className = 'step-number';
+                num.innerText = index + 1;
+
+                const content = document.createElement('div');
+                content.className = 'step-content';
+
+                const titleEl = document.createElement('div');
+                titleEl.className = 'step-title';
+                titleEl.innerText = title;
+
+                const descEl = document.createElement('div');
+                descEl.className = 'step-desc';
+                descEl.innerText = desc;
+
+                content.appendChild(titleEl);
+                content.appendChild(descEl);
+
+                step.appendChild(num);
+                step.appendChild(content);
+
+                roadmapContainer.appendChild(step);
+            });
+
+            document.getElementById('results').style.display = 'flex';
+        }
+
+        function toggleView() {
+            const toggle = document.getElementById('viewToggle');
+            const mode = toggle.checked ? 'recruiter' : 'student';
+            updateSummaryDisplay(mode);
+        }
+
+        function setSummaryView(mode) {
+            const toggle = document.getElementById('viewToggle');
+            toggle.checked = (mode === 'recruiter');
+            updateSummaryDisplay(mode);
+        }
+
+        function updateSummaryDisplay(mode) {
+            if (!currentSummaryData) return;
+
+            const textEl = document.getElementById('summaryText');
+            const subEl = document.getElementById('viewDescription');
+            const lblStudent = document.getElementById('lblStudent');
+            const lblRecruiter = document.getElementById('lblRecruiter');
+
+            if (mode === 'student') {
+                textEl.innerText = currentSummaryData.student;
+                subEl.innerText = "Currently showing growth-oriented mentorship feedback.";
+                subEl.className = "view-desc-text"; // Reset class
+                lblStudent.classList.add('active');
+                lblRecruiter.classList.remove('active');
+            } else {
+                textEl.innerText = currentSummaryData.recruiter;
+                subEl.innerText = "Currently showing hiring-signal risk assessment.";
+                subEl.classList.add("recruiter-mode");
+                lblStudent.classList.remove('active');
+                lblRecruiter.classList.add('active');
+            }
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('repoUrl').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                analyzeRepo();
+            }
+        });
+    </script>
+</body>
+
+</html>
